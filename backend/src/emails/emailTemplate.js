@@ -1,3 +1,9 @@
+/**
+ * Builds an HTML welcome email personalized with the recipient's name and an action link.
+ * @param {string} name - Recipient display name inserted into the greeting.
+ * @param {string} clientURL - URL placed on the email's primary call-to-action button.
+ * @returns {string} The complete HTML email template with `name` and `clientURL` interpolated.
+ */
 export function createWelcomeEmailTemplate(name, clientURL) {
   return `
   <!DOCTYPE html>
