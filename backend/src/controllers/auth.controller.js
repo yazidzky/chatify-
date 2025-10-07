@@ -1,6 +1,9 @@
+import { sendWelcomeEmail } from "../emails/emailHandlers.js";
+import { ENV } from "../lib/env.js";
 import { generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
   try {
@@ -33,10 +36,6 @@ export const signup = async (req, res) => {
     });
 
     if (newUser) {
-    } else {
-      res.status(400).json({ message: "Ivalid use data" });
-    }
-    if (newUser) {
       // generateToken(newUser._id, res);
       // await newUser.save();
 
@@ -49,6 +48,17 @@ export const signup = async (req, res) => {
         email: newUser.email,
         profilePic: newUser.profilePic,
       });
+      try {
+        await sendWelcomeEmail(
+          savedUser.email,
+          savedUser.fullName,
+          ENV.CLIENT_URL
+        );
+      } catch (error) {
+        console.error("Error sending welcome email:", error);
+      }
+    } else {
+      res.status(400).json({ message: "Ivalid use data" });
     }
   } catch (error) {
     console.log("error in signup controller:", error);
