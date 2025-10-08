@@ -100,16 +100,18 @@ export const updateProfile = async (req, res) => {
       return res.status(400).json({ message: "profilePic is required" });
 
     const userId = req.user._id;
-    const uploadedResponse = await cloudinary.uploader.upload(profilePic);
-    const upadartedUser = await User.findByIdAndUpdate(
+
+    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        profilePic: uploadedResponse.secure_url,
+        profilePic: uploadResponse.secure_url,
       },
       { new: true }
     );
 
-    res.status(200).json(upadartedUser);
+    res.status(200).json(updatedUser);
   } catch (error) {
     console.log("error in updateProfile controller:", error);
     res.status(500).json({ message: "Internal server error" });
