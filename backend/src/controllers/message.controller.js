@@ -1,11 +1,12 @@
 import Message from "../models/Message.js";
 import User from "../models/User.js";
+import cloudinary from "../lib/cloudinary.js";
 export const getAllContacts = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
     const filteredUsers = await User.find({
       _id: { $ne: loggedInUserId },
-    }).select("-pasword");
+    }).select("-password");
 
     res.status(200).json(filteredUsers);
   } catch (error) {
@@ -14,7 +15,7 @@ export const getAllContacts = async (req, res) => {
   }
 };
 
-export const getMassagesByUserId = async (req, res) => {
+export const getMessagesByUserId = async (req, res) => {
   try {
     const myId = req.user._id;
     const { id: userToChatId } = req.params;
@@ -28,7 +29,7 @@ export const getMassagesByUserId = async (req, res) => {
 
     res.status(200).json(messages);
   } catch (error) {
-    console.log("Error in getMassagesByUserId:", error.messages);
+    console.log("Error in getMassagesByUserId:", error.message);
     res.status(500).json({ error: "internal Server Error" });
   }
 };
@@ -38,6 +39,14 @@ export const sendMessage = async (req, res) => {
     const { text, image } = req.body;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
+
+    if (!text && !image) {
+      return res.status(400).json({ error: "Message must have text or image" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(receiverId)) {
+      return res.status(400).json({ error: "Invalid receiver ID" });
+    }
 
     let imageUrl;
     if (image) {
