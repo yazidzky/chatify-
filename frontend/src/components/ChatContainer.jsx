@@ -21,8 +21,6 @@ function ChatContainer() {
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
     subscribeToMessages();
-
-    // clean up
     return () => unsubscribeFromMessages();
   }, [
     selectedUser,
@@ -32,9 +30,7 @@ function ChatContainer() {
   ]);
 
   useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
@@ -51,9 +47,9 @@ function ChatContainer() {
                 }`}
               >
                 <div
-                  className={`chat-bubble relative ${
+                  className={`chat-bubble ${
                     msg.senderId === authUser._id
-                      ? "bg-cyan-600 text-white"
+                      ? "bg-green-600 text-white" // ← hijau
                       : "bg-slate-800 text-slate-200"
                   }`}
                 >
@@ -65,7 +61,7 @@ function ChatContainer() {
                     />
                   )}
                   {msg.text && <p className="mt-2">{msg.text}</p>}
-                  <p className="text-xs mt-1 opacity-75 flex items-center gap-1">
+                  <p className="text-xs mt-1 opacity-75">
                     {new Date(msg.createdAt).toLocaleTimeString(undefined, {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -74,7 +70,6 @@ function ChatContainer() {
                 </div>
               </div>
             ))}
-            {/* 👇 scroll target */}
             <div ref={messageEndRef} />
           </div>
         ) : isMessagesLoading ? (
@@ -83,7 +78,6 @@ function ChatContainer() {
           <NoChatHistoryPlaceholder name={selectedUser.fullName} />
         )}
       </div>
-
       <MessageInput />
     </>
   );
